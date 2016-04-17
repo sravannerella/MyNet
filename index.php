@@ -1,63 +1,17 @@
 <?php
   include 'connect/connect.php';
+
+  if(!isset($_SESSION["email"])){
+    echo "Why are you here?";
+  } else{
+    echo "Welcome";
+  }
 ?>
 
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">
-  <div class="w3-third">
-  <div class="w3-container w3-blue">
-    <h2>Register Now</h2>
-  </div>
-  <form id="submitForm" class="w3-container w3-card-4">
-    <div class="w3-group">
-      <label class="w3-label w3-text-blue">First Name</label>
-      <input class="w3-input w3-border" type="text" name="first" id="first" required>
-    </div>
-    <div class="w3-group">      
-      <label class="w3-label w3-text-blue">Last Name</label>
-      <input class="w3-input w3-border" type="text" name="last" id="last" required>
-    </div>
-    <div class="w3-group">      
-      <label class="w3-label w3-text-blue">Email</label>
-      <input class="w3-input w3-border" type="text" id="email" name="email" required>
-    </div>
-    <div class="w3-group">      
-      <label class="w3-label w3-text-blue">Password</label>
-      <input class="w3-input w3-border" type="password" name="password" id="password" required>
-    </div>
-    <div class="w3-group">      
-      <label class="w3-label w3-text-blue">Re-type Password</label>
-      <input class="w3-input w3-border" type="password" name="password" id="retype" required>
-    </div>
-    <div class="w3-group">      
-      <label class="w3-label w3-text-blue">Birth Date</label>
-      <input class="w3-input w3-border" type="date" name="bdate" id="bdate" required>
-    </div>
-    <div class="w3-row-padding">
-      <label class="w3-checkbox w3-text-blue">
-        <div class="w3-checkmark"></div> Male
-        <input type="radio" name="gender" id="gender" value="male">
-      </label>
-      <label class="w3-checkbox w3-text-blue">
-        <div class="w3-checkmark"></div> Female
-        <input type="radio" name="gender" id="gender" value="female">
-      </label>
-    </div>
-    <br>
-    <div class="w3-row">
-      <button id="submitButton" name="submitButton" class="w3-btn w3-blue">Register</button>
-    </div>
-    <br>
-  </form>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-container">
-      
-    </div>
-  </div>
 
   <div class="w3-third w3-container">
-    <br><br><br>
+    <br>
     <div class="w3-container w3-padding-0">
       <center><h3>A place to hangout with your friends and get in touch with new ones.</h3></center>
     </div>
@@ -86,43 +40,91 @@
       </center>
     </div>
   </div>
+
+  <div class="w3-third">
+    <div class="w3-container">
+      
+    </div>
+  </div>
+
+  <div class="w3-third">
+    <br><br><br>
+    <div class="w3-container w3-blue">
+      <h2>Login</h2>
+    </div>
+    <form id="submitForm" class="w3-container w3-card-4">
+      <div class="w3-group">      
+        <label class="w3-label w3-text-blue">Email</label>
+        <input class="w3-input w3-border" type="text" id="email" name="email" required>
+      </div>
+      <div class="w3-group">      
+        <label class="w3-label w3-text-blue">Password</label>
+        <input class="w3-input w3-border" type="password" name="password" id="password" required>
+      </div>
+      <br>
+      <div class="w3-row">
+        <div class="w3-third">
+          <button id="loginButton" name="loginButton" class="w3-btn-block w3-teal">Login</button>
+        </div>
+        <div class="w3-third">
+          <div class="w3-container">
+            &nbsp;
+          </div>
+        </div>
+        <div class="w3-third">
+          <button id="registerButton" name="registerButton" class="w3-btn-block w3-light-green"> Register </button>
+        </div>
+      </div>
+      <br>
+    </form>
+  </div>
+
 </div>
 <br><br>
-<footer class="w3-container w3-theme-d3 w3-padding-hor-16">
+<footer class="w3-container w3-leftbar w3-border-teal w3-theme-d3 w3-padding-hor-16">
   <p>AREAL - Created By Sravan Kumar and Suresh Padmanabhan</p>
 </footer>
 
 <script>
-    $("#submitButton").click(function(){
-      alert("Registering");
-      var first = $("#first").val();
-      var last = $("#last").val();
-      var email = $("#email").val();
-      var password = $("#password").val();
-      var retype = $("#retype").val();
-      var gender = $("#gender").val();
-      var bdate = $("#bdate").val();
-      $("#submitForm").unbind().submit(function(e){
-        e.preventDefault();
-        var call = $.ajax({
-          url: "connect/getRegister.php",
-          type: "POST",
-          cache: false,
-          data: {
-            first: first,
-            last: last,
-            email: email,
-            password: password,
-            gender: gender,
-            bdate: bdate
-          },
-          success: function(data){
-            alert("Registeration success");
+  $("#registerButton").click(function(){
+    window.open("register.php","_self");
+  });
+
+  $("#loginButton").click(function(){
+    var email = $("#email").val();
+    var password = $("#password").val();
+    $("#submitForm").unbind().submit(function(e){
+      e.preventDefault();
+      $.ajax({
+        url: "connect/getContent.php",
+        type: "POST",
+        cache: false,
+        dataType: 'json',
+        data: {
+          email: email,
+          password: password
+        },
+        success: function(data){
+          $("#submitForm").trigger("reset");
+          if(data["result"] == "matched!"){
+            //window.open("home.php", "_self");
+            console.log(data["email"]);
+            $.ajax({
+              url: "connect/getSession.php",
+              type: "POST",
+              cache: false,
+              data: {
+                email: data["email"]
+              },
+              success: function(){
+                window.open("home.php", "_self");
+              }
+            });
           }
-        });
-        console.log(call);
+        }
       });
     });
+  });
 </script>
 
 <script type="text/javascript">

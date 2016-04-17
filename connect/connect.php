@@ -8,6 +8,14 @@
 	if($connection->connect_error){
 		die("Couldn't connect");
 	}
+
+  session_start();
+  if($_SESSION["email"]){
+    $user = $_SESSION["email"];
+  }
+  else{
+    $user = "";
+  }
 ?>
 
 <!DOCTYPE html>

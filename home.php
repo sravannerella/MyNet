@@ -1,6 +1,15 @@
 <?php
   include 'connect/connect.php';
+
+  if(!isset($_SESSION["email"])){
+    echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com\">";
+  } else{
+    echo "Welcome";
+  }
+
 ?>
+
+
 
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">    
