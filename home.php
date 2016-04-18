@@ -1,10 +1,51 @@
 <?php
   include 'connect/connect.php';
 
-  if(!isset($_SESSION["email"])){
+  if(isset($_GET['profile'])==TRUE){
+    $username = ucfirst($_GET['profile']);
+    $querier = "SELECT * FROM `Users` WHERE first = '".$username."';";
+    $results = $connection->query($querier);
+    if(mysqli_num_rows($results) > 0){
+      $row = mysqli_fetch_object($results);
+      $first = $row->first;
+      $last = $row->last;
+      $birth = $row->birth_Date;
+      $email = $row->email;
+
+      $nquerier = "SELECT * FROM `location` WHERE email = '".$email."';";
+      $queryResults = $connection->query($nquerier);
+      $row = mysqli_fetch_object($queryResults);
+      $city = $row->city;
+      $state = $row->state;
+
+      $sql = "SELECT * FROM `status` WHERE user_from = '". $email."';";
+      $results = $connection->query($sql);
+
+    } else{
+      echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com/404.php\">";
+    }
+  }
+
+  else if(!isset($_SESSION["email"])){
     echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com\">";
   } else{
-    echo "Welcome";
+    $email = $_SESSION["email"];
+    $querier = "SELECT * FROM `Users` WHERE email = '".$email."';";
+    $queryResults = $connection->query($querier);
+    $row = mysqli_fetch_object($queryResults);
+    $username = ucfirst($row->first);
+    $first = $row->first;
+    $last = $row->last;
+    $birth = $row->birth_Date;
+
+    $nquerier = "SELECT * FROM `location` WHERE email = '".$email."';";
+    $queryResults = $connection->query($nquerier);
+    $row = mysqli_fetch_object($queryResults);
+    $city = $row->city;
+    $state = $row->state;
+
+    $sql = "SELECT * FROM `status` WHERE user_from = '". $email."';";
+    $results = $connection->query($sql);
   }
 
 ?>
@@ -20,12 +61,12 @@
       <!-- Profile -->
       <div class="w3-card-2 w3-round w3-white">
         <div class="w3-container">
-         <h4 class="w3-center">My Profile</h4>
+         <h4 class="w3-center"><?php echo $username; ?>'s Profile</h4>
          <p class="w3-center"><img src="#" class="w3-circle" height="106" width="106" alt="Avatar"></p>
          <hr>
-         <p><i class="fa fa-pencil w3-margin-right w3-text-theme"></i> NAME</p>
-         <p><i class="fa fa-home w3-margin-right w3-text-theme"></i> CITY, STATE</p>
-         <p><i class="fa fa-birthday-cake w3-margin-right w3-text-theme"></i> MONTH DATE, YEAR</p>
+         <p ><i class="fa fa-pencil w3-margin-right w3-text-theme"></i> <?php echo ucfirst($first)." ".ucfirst($last); ?></p>
+         <p><i class="fa fa-home w3-margin-right w3-text-theme"></i><?php echo ucfirst(strtolower($city)).", ".ucfirst(strtolower($state)); ?></p>
+         <p><i class="fa fa-birthday-cake w3-margin-right w3-text-theme"></i> <?php echo $birth; ?></p>
         </div>
       </div>
       <br>
@@ -103,7 +144,7 @@
     </div>
     
     <!-- Middle Column -->
-    <div class="w3-col m7">
+    <div id="myPosts" name="myPosts" class="w3-col m7">
     
       <div class="w3-row-padding">
         <div class="w3-col m12">
@@ -120,23 +161,22 @@
         </div>
       </div>
       
-      <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
-        <img src="" alt="Avatar" class="w3-left w3-circle w3-margin-right" height="106" width="106">
-        <span class="w3-right w3-opacity">1 min</span>
-        <h4>Suresh Padmanabhan</h4> 
-        <hr class="w3-clear">
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-          <div class="w3-row-padding" style="margin:0 -16px">
-            <div class="w3-half">
-              <img src="#" height="106" width="100%" alt="Northern Lights" class="w3-margin-bottom">
-            </div>
-            <div class="w3-half">
-              <img src="#" height="106" width="100%" alt="Nature" class="w3-margin-bottom">
-          </div>
-        </div>
-        <button type="button" class="w3-btn w3-theme-d1 w3-margin-bottom"><i class="fa fa-thumbs-up"></i> Like</button> 
-        <button type="button" class="w3-btn w3-theme-d2 w3-margin-bottom"><i class="fa fa-comment"></i> Comment</button> 
-      </div>
+      <?php
+        while($row = mysqli_fetch_object($results)){
+          $status = $row->text;
+          echo "
+          <div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br>
+            <img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='106' width='106'>
+            <span class='w3-right w3-opacity'>1 min</span>
+            <h4>". ucfirst(strtolower($first))." ".ucfirst(strtolower($last)) ."</h4> 
+            <hr class='w3-clear'>
+            <p>". $status."</p>
+            <button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> 
+            <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> 
+          </div>";
+        }
+
+      ?>
       
     <!-- End Middle Column -->
     </div>
@@ -144,12 +184,12 @@
     <!-- Right Column -->
     <div class="w3-col m2">
       
-      <div class="w3-card-2 w3-round w3-white w3-center">
+      <div class="w3-card-2 w3-round w3-white w3-center w3-dark-grey">
         <div class="w3-container">
           <p>Friend Request</p>
           <img src="" alt="Avatar" height="106" width="106"><br>
           <span>Suresh</span>
-          <div class="w3-row w3-opacity">
+          <div class="w3-row">
             <div class="w3-half">
               <button class="w3-btn w3-green w3-btn-block w3-section" title="Accept"><i class="fa fa-check"></i></button>
             </div>
@@ -195,17 +235,24 @@
     //Submitting the status
     $("#submitPost").click(function(){
         var status = $("#status").val();
+        var email = '<?php echo $email;?>';
         $("#statusForm").unbind().submit(function(e){
           e.preventDefault();
           $.ajax({
             url: "connect/getContent.php",
             type: "POST",
+            dataType: 'json',
             cache: false,
             data: {
-              status: status
+              status: status,
+              email: email
             },
             success: function(data){
               $("#status").val('');
+              $("#myPosts").append("<div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br><img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='106' width='106'><span class='w3-right w3-opacity'>1 min</span><h4>"+ data["first"] + " "+ data["last"] +"</h4> <hr class='w3-clear'><p>"+ data["result"] +"</p><button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> </div>");
+            },
+            error: function(data){
+              alert("failed");
             }
           });
         });

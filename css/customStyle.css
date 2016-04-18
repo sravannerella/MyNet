@@ -33,3 +33,7 @@ label{
 		display: block;
 	}
 }
+
+#profile{
+	border-style: none;
+}

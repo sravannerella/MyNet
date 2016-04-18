@@ -32,11 +32,19 @@
     </div>
     <div class="w3-group">      
       <label class="w3-label w3-text-blue">Re-type Password</label>
-      <input class="w3-input w3-border" type="password" name="password" id="retype" required>
+      <input class="w3-input w3-border" type="password" name="retype" id="retype" required>
     </div>
     <div class="w3-group">      
       <label class="w3-label w3-text-blue">Birth Date</label>
       <input class="w3-input w3-border" type="date" name="bdate" id="bdate" required>
+    </div>
+    <div class="w3-group">
+      <label class="w3-label w3-text-blue">City</label>
+      <input class="w3-input w3-border" type="text" name="city" id="city" required>
+    </div>
+    <div class="w3-group">
+      <label class="w3-label w3-text-blue">State</label>
+      <input class="w3-input w3-border" type="text" name="state" id="state" required>
     </div>
     <div class="w3-row-padding">
       <label class="w3-checkbox w3-text-blue">
@@ -89,23 +97,33 @@
       var retype = $("#retype").val();
       var gender = $("#gender").val();
       var bdate = $("#bdate").val();
+      var city = $("#city").val();
+      var state = $("#state").val();
       $("#submitForm").unbind().submit(function(e){
         e.preventDefault();
         var call = $.ajax({
           url: "connect/getRegister.php",
           type: "POST",
           cache: false,
+          dataType: 'json',
           data: {
             first: first,
             last: last,
             email: email,
             password: password,
             gender: gender,
-            bdate: bdate
+            bdate: bdate,
+            city: city,
+            state: state,
+            retype: retype
           },
           success: function(data){
-            alert("Registeration success");
-            $("#submitForm").trigger("reset");
+            if(data["result"]=="matched!"){
+              alert("Registeration success");
+              $("#submitForm").trigger("reset");
+            } else{
+              alert("Passwords are not matching");
+            }
           }
         });
         console.log(call);

@@ -39,14 +39,22 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
   <li class="w3-hide-medium w3-hide-large w3-opennav w3-right">
     <a class="w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
   </li>
-  <li><a href="#" class="w3-padding-large w3-hover-black w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>AREAL</a></li>
-  <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Search"><i class="fa fa-search"></i></a></li>
+  <li><a href="index.php" class="w3-padding-large w3-hover-black w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>AREAL</a></li>
+
+  <li>
+      <form id="submitForm" class="w3-container w3-large w3-center" id="statusForm">
+        <input class="w3-animate-input" type="text" id="profile" name="profile" placeholder="Search" style="width:70%; max-width: 70%; color: black; margin-top: 10px;">
+        <button id="submit" class="w3-btn fa fa-search"></button>
+      </form>
+  </li>
+
+  <!-- <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Search"><i class="fa fa-search"></i></a></li> -->
   <li class="w3-hide-small w3-dropdown-hover">
     <a href="#" class="w3-padding-large w3-hover-white" title="Notifications"><i class="fa fa-user"></i></a>     
     <div class="w3-dropdown-content w3-medium w3-white w3-card-4">
       <a href="home.php">My Profile</a>
       <a href="#">Settings</a>
-      <a href="#">Log Off</a>
+      <a href="logoff.php">Log Off</a>
     </div>
   </li>
   <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Messages"><i class="fa fa-envelope"></i></a></li>
