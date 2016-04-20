@@ -89,7 +89,6 @@
 
 <script>
     $("#submitButton").click(function(){
-      alert("Registering");
       var first = $("#first").val();
       var last = $("#last").val();
       var email = $("#email").val();
@@ -99,7 +98,7 @@
       var bdate = $("#bdate").val();
       var city = $("#city").val();
       var state = $("#state").val();
-      $("#submitForm").unbind().submit(function(e){
+      $("form").unbind().submit(function(e){
         e.preventDefault();
         var call = $.ajax({
           url: "connect/getRegister.php",
@@ -120,7 +119,7 @@
           success: function(data){
             if(data["result"]=="matched!"){
               alert("Registeration success");
-              $("#submitForm").trigger("reset");
+              $("form").trigger("reset");
             } else{
               alert("Passwords are not matching");
             }

@@ -1,32 +1,7 @@
 <?php
   include 'connect/connect.php';
 
-  if(isset($_GET['profile'])==TRUE){
-    $username = ucfirst($_GET['profile']);
-    $querier = "SELECT * FROM `Users` WHERE first = '".$username."';";
-    $results = $connection->query($querier);
-    if(mysqli_num_rows($results) > 0){
-      $row = mysqli_fetch_object($results);
-      $first = $row->first;
-      $last = $row->last;
-      $birth = $row->birth_Date;
-      $email = $row->email;
-
-      $nquerier = "SELECT * FROM `location` WHERE email = '".$email."';";
-      $queryResults = $connection->query($nquerier);
-      $row = mysqli_fetch_object($queryResults);
-      $city = $row->city;
-      $state = $row->state;
-
-      $sql = "SELECT * FROM `status` WHERE user_from = '". $email."';";
-      $results = $connection->query($sql);
-
-    } else{
-      echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com/404.php\">";
-    }
-  }
-
-  else if(!isset($_SESSION["email"])){
+  if(!isset($_SESSION["email"])){
     echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com\">";
   } else{
     $email = $_SESSION["email"];
@@ -43,9 +18,36 @@
     $row = mysqli_fetch_object($queryResults);
     $city = $row->city;
     $state = $row->state;
+    $email2 = $email;
 
-    $sql = "SELECT * FROM `status` WHERE user_from = '". $email."';";
+    $sql = "SELECT * FROM `status` WHERE user_from = '". $email."' OR user_to = '".$email."';";
     $results = $connection->query($sql);
+  }
+
+  if(isset($_GET['profile'])==TRUE){
+    $email = $_SESSION["email"];
+    $username = ucfirst($_GET['profile']);
+    $querier = "SELECT * FROM `Users` WHERE first = '".$username."';";
+    $results = $connection->query($querier);
+    if(mysqli_num_rows($results) > 0){
+      $row = mysqli_fetch_object($results);
+      $first = $row->first;
+      $last = $row->last;
+      $birth = $row->birth_Date;
+      $email2 = $row->email;
+
+      $nquerier = "SELECT * FROM `location` WHERE email = '".$email2."';";
+      $queryResults = $connection->query($nquerier);
+      $row = mysqli_fetch_object($queryResults);
+      $city = $row->city;
+      $state = $row->state;
+
+      $sql = "SELECT * FROM `status` WHERE user_from = '". $email2."' OR user_to = '".$email2."';";
+      $results = $connection->query($sql);
+
+    } else{
+      echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com/404.php\">";
+    }
   }
 
 ?>
@@ -164,16 +166,41 @@
       <?php
         while($row = mysqli_fetch_object($results)){
           $status = $row->text;
-          echo "
-          <div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br>
-            <img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='106' width='106'>
-            <span class='w3-right w3-opacity'>1 min</span>
-            <h4>". ucfirst(strtolower($first))." ".ucfirst(strtolower($last)) ."</h4> 
-            <hr class='w3-clear'>
-            <p>". $status."</p>
-            <button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> 
-            <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> 
-          </div>";
+          $user_from= $row->user_from;
+          $user_to = $row->user_to;
+          
+          $results2 = $connection->query("SELECT * FROM Users WHERE email = '".$user_from."';");
+          $nrow = mysqli_fetch_object($results2);
+          $first1 = $nrow->first;
+          $last1 = $nrow->last;
+          
+          $results3 = $connection->query("SELECT * FROM Users WHERE email = '".$user_to."';");
+          $nnrow = mysqli_fetch_object($results3);
+          $first2 = $nnrow->first;
+          $last2 = $nnrow->last;
+
+          if($user_from == $user_to){
+            echo "
+            <div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br>
+              <img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='75' width='75'>
+              <span class='w3-right w3-opacity'>1 min</span>
+              <p><b>". ucfirst(strtolower($first1))." ".ucfirst(strtolower($last1)) . "</b> <i>posted on his activity feed</i>" . "</p> 
+              <p>". $status."</p>
+              <button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> 
+              <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> 
+            </div>";
+          } else{
+            echo "
+            <div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br>
+              <img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='75' width='75'>
+              <span class='w3-right w3-opacity'>1 min</span>
+              <p><b>". ucfirst(strtolower($first1))." ".ucfirst(strtolower($last1)). "</b> <i>posted on</i> <b>". ucfirst(strtolower($first2))." ".ucfirst(strtolower($last2)) ."</b></p> 
+              <p>". $status."</p>
+              <button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> 
+              <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> 
+            </div>";
+          }
+
         }
 
       ?>
@@ -236,6 +263,7 @@
     $("#submitPost").click(function(){
         var status = $("#status").val();
         var email = '<?php echo $email;?>';
+        var email2 = '<?php echo $email2; ?>';
         $("#statusForm").unbind().submit(function(e){
           e.preventDefault();
           $.ajax({
@@ -245,11 +273,12 @@
             cache: false,
             data: {
               status: status,
-              email: email
+              email: email,
+              email2: email2
             },
             success: function(data){
               $("#status").val('');
-              $("#myPosts").append("<div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br><img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='106' width='106'><span class='w3-right w3-opacity'>1 min</span><h4>"+ data["first"] + " "+ data["last"] +"</h4> <hr class='w3-clear'><p>"+ data["result"] +"</p><button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> </div>");
+              $("#myPosts").append("<div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br><img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='75' width='75'><span class='w3-right w3-opacity'>1 min</span><p><b>"+ data["first"] + " "+ data["last"] +"</b></p><p>"+ data["result"] +"</p><button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> </div>");
             },
             error: function(data){
               alert("failed");

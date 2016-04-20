@@ -4,7 +4,7 @@
   if(!isset($_SESSION["email"])){
     echo "Why are you here?";
   } else{
-    echo "Welcome";
+    echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com/home.php\">";
   }
 ?>
 
@@ -93,7 +93,8 @@
   $("#loginButton").click(function(){
     var email = $("#email").val();
     var password = $("#password").val();
-    $("#submitForm").unbind().submit(function(e){
+    console.log(email);
+    $("form").unbind().submit(function(e){
       e.preventDefault();
       $.ajax({
         url: "connect/getContent.php",
@@ -105,9 +106,8 @@
           password: password
         },
         success: function(data){
-          $("#submitForm").trigger("reset");
           if(data["result"] == "matched!"){
-            //window.open("home.php", "_self");
+            $("form").trigger("reset");
             console.log(data["email"]);
             $.ajax({
               url: "connect/getSession.php",
@@ -117,10 +117,12 @@
                 email: data["email"]
               },
               success: function(){
-                window.open("home.php", "_self");
-              }
+                window.open("home.php", "_self");              }
             });
           }
+        },
+        error: function(data){
+          console.log("Failed");
         }
       });
     });
