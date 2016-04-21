@@ -37,3 +37,23 @@ label{
 #profile{
 	border-style: none;
 }
+
+.customVideo{
+	width: 420px;
+}
+
+@media screen and (max-width: 435px){
+	.customVideo{
+		width: 280px;
+	}
+}
+
+@media screen and (max-width: 365px){
+	.customVideo{
+		width: 230px;
+	}
+}
+
+#hoverer{
+	background-color: #3498db !important;
+}

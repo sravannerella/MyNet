@@ -31,6 +31,31 @@
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
 </style>
+
+
+<script type="text/javascript">
+    function searchUser() {
+      var username = $("#profile").val();
+      console.log(username);
+      $.post("connect/findUsers.php", 
+        {
+          username: username
+        },
+        function(data){
+          $("#resultsNew").html(data);
+        });
+    }
+
+    function showSub() {
+      var x = document.getElementById("resultsNew");
+      if (x.className.indexOf("w3-show") == -1) 
+          x.className += " w3-show";
+      else 
+          x.className = x.className.replace(" w3-show", "");
+    }
+</script>
+
+
 <body class="w3-theme-l5">
 
 <!-- Navbar -->
@@ -41,11 +66,13 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
   </li>
   <li><a href="index.php" class="w3-padding-large w3-hover-black w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>AREAL</a></li>
 
-  <li>
+  <li id="hoverer" class="w3-hide-small w3-dropdown-click">
       <form id="submitForm" class="w3-container w3-large w3-center" id="statusForm">
-        <input class="w3-animate-input" type="text" id="profile" name="profile" placeholder="Search" style="width:70%; max-width: 70%; color: black; margin-top: 10px;">
+        <input class="w3-animate-input" type="text" id="profile" name="profile" placeholder="Search" onkeyup="searchUser();" onclick="showSub();" style="width:70%; max-width: 70%; color: black; margin-top: 10px;">
         <button id="submit" class="w3-btn fa fa-search"></button>
       </form>
+      <div id="resultsNew" class="w3-dropdown-content w3-medium w3-white w3-card-4">
+      </div>
   </li>
 
   <!-- <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Search"><i class="fa fa-search"></i></a></li> -->
@@ -57,6 +84,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
       <a href="logoff.php">Log Off</a>
     </div>
   </li>
+
   <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Messages"><i class="fa fa-envelope"></i></a></li>
   <li class="w3-hide-small w3-dropdown-hover">
     <a href="#" class="w3-padding-large w3-hover-white" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green">3</span></a>     

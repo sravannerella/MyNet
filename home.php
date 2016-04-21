@@ -20,7 +20,7 @@
     $state = $row->state;
     $email2 = $email;
 
-    $sql = "SELECT * FROM `status` WHERE user_from = '". $email."' OR user_to = '".$email."';";
+    $sql = "SELECT * FROM `status` WHERE user_from = '". $email."' OR user_to = '".$email."' ORDER BY `time` DESC LIMIT 10;";
     $results = $connection->query($sql);
   }
 
@@ -42,7 +42,7 @@
       $city = $row->city;
       $state = $row->state;
 
-      $sql = "SELECT * FROM `status` WHERE user_from = '". $email2."' OR user_to = '".$email2."';";
+      $sql = "SELECT * FROM `status` WHERE user_from = '". $email2."' OR user_to = '".$email2."' ORDER BY `time` DESC LIMIT 10;";
       $results = $connection->query($sql);
 
     } else{
@@ -146,15 +146,15 @@
     </div>
     
     <!-- Middle Column -->
-    <div id="myPosts" name="myPosts" class="w3-col m7">
+    <div class="w3-col m6">
     
-      <div class="w3-row-padding">
+      <div class="w3-row-padding" id="myPosts" name="myPosts">
         <div class="w3-col m12">
           <div class="w3-card-2 w3-round w3-white">
             <div class="w3-container w3-padding">
               <h6 class="w3-opacity">Status:</h6>
               <form class="w3-container" id="statusForm">
-                  <input class="w3-input w3-animate-input" type="text" id="status" name="status" placeholder="Share your feelings:" style="width:70%">
+                  <textarea class="w3-input w3-animate-input" id="status" name="status" placeholder="Share your feelings:" onkeyup="AutoGrowTextArea(this)" style="width:70%; resize: vertical;"></textarea>
                   <br>
                   <button class="w3-btn w3-theme" id="submitPost" name="submitPost"><i class="fa fa-pencil"></i> Post</button>
               </form>
@@ -179,13 +179,19 @@
           $first2 = $nnrow->first;
           $last2 = $nnrow->last;
 
+          $patterns[] = '|https://www\.youtube\.com/watch\?.*\bv=([^ ]+)|';
+          $replacements[] = '<br><center><iframe width="420" class="w3-card-4 customVideo" height="315" src=http://www.youtube.com/embed/$1 frameborder="0" allowfullscreen></iframe></center><br />';
+          $patterns[] = '|&feature=related|';
+          $replacements[] = '';
+          $status = preg_replace($patterns, $replacements, $status);
+
           if($user_from == $user_to){
             echo "
             <div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br>
               <img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='75' width='75'>
               <span class='w3-right w3-opacity'>1 min</span>
-              <p><b>". ucfirst(strtolower($first1))." ".ucfirst(strtolower($last1)) . "</b> <i>posted on his activity feed</i>" . "</p> 
-              <p>". $status."</p>
+              <p><b><a href='http://areal.x10host.com/". $first2. "'>". ucfirst(strtolower($first1))." ".ucfirst(strtolower($last1)) . "</a></b> <i>posted on his activity feed</i>" . "</p><br> 
+              <p style='max-height:150px; overflow:hidden;'>". nl2br($status)."</p>
               <button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> 
               <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> 
             </div>";
@@ -194,8 +200,8 @@
             <div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br>
               <img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='75' width='75'>
               <span class='w3-right w3-opacity'>1 min</span>
-              <p><b>". ucfirst(strtolower($first1))." ".ucfirst(strtolower($last1)). "</b> <i>posted on</i> <b>". ucfirst(strtolower($first2))." ".ucfirst(strtolower($last2)) ."</b></p> 
-              <p>". $status."</p>
+              <p><b><a href='http://areal.x10host.com/". $first1 . "'>". ucfirst(strtolower($first1))." ".ucfirst(strtolower($last1)). "</a> </b> <i>posted on</i> <b><a href='http://areal.x10host.com/". $first2. "'>". ucfirst(strtolower($first2))." ".ucfirst(strtolower($last2)) ."</a></b></p> 
+              <p>". nl2br($status)."</p>
               <button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> 
               <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> 
             </div>";
@@ -278,7 +284,7 @@
             },
             success: function(data){
               $("#status").val('');
-              $("#myPosts").append("<div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br><img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='75' width='75'><span class='w3-right w3-opacity'>1 min</span><p><b>"+ data["first"] + " "+ data["last"] +"</b></p><p>"+ data["result"] +"</p><button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> </div>");
+              $("#myPosts").after("<div class='w3-container w3-card-2 w3-white w3-round w3-margin'><br><img src='' alt='Avatar' class='w3-left w3-circle w3-margin-right' height='75' width='75'><span class='w3-right w3-opacity'>1 min</span><p><b>"+ data["first"] + " "+ data["last"] +"</b></p><p>"+ data["result"] +") ?></p><button type='button' class='w3-btn w3-theme-d1 w3-margin-bottom'><i class='fa fa-thumbs-up'></i> Like</button> <button type='button' class='w3-btn w3-theme-d2 w3-margin-bottom'><i class='fa fa-comment'></i> Comment</button> </div>");
             },
             error: function(data){
               alert("failed");
@@ -310,6 +316,22 @@ function openNav() {
     } else { 
         x.className = x.className.replace(" w3-show", "");
     }
+}
+
+// Auto-Grow-TextArea script.
+// Script copyright (C) 2011 www.cryer.co.uk.
+// Script is free to use provided this copyright header is included.
+function AutoGrowTextArea(textField)
+{
+  if (textField.clientHeight < textField.scrollHeight)
+  {
+    textField.style.height = textField.scrollHeight + "px";
+    if (textField.clientHeight < textField.scrollHeight)
+    {
+      textField.style.height = 
+        (textField.scrollHeight * 2 - textField.clientHeight) + "px";
+    }
+  }
 }
 </script>
 

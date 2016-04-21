@@ -2,7 +2,7 @@
   include 'connect/connect.php';
 
   if(!isset($_SESSION["email"])){
-    echo "Why are you here?";
+    echo "";
   } else{
     echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com/home.php\">";
   }
