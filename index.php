@@ -10,7 +10,7 @@
 
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">
 
-  <div class="w3-third w3-container">
+  <div class="w3-third w3-container" id="iconers">
     <br>
     <div class="w3-container w3-padding-0">
       <center><h3>A place to hangout with your friends and get in touch with new ones.</h3></center>

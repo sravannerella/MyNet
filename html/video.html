@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Video</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+</head>
+<body>
+	<p align="center"><input type="button" id="share_screen" value="Share screen"/></p>
+	<p align="center"><video id="video" autoplay/></p>
+	<script type="text/javascript">
+     	navigator.getUserMedia = (navigator.getUserMedia ||
+                       navigator.webkitGetUserMedia ||
+                       navigator.mozGetUserMedia ||
+                       navigator.msGetUserMedia) ;
+     	$('#share_screen').click(function() {
+          	navigator.getUserMedia({
+                   	audio: false,
+                   	video: {
+                       	mandatory: {
+                           	chromeMediaSource: 'screen',
+                           	maxWidth: 1280,
+                           	maxHeight: 720
+                       	},
+                       	optional: []
+                   	}
+               	}, function(stream) {
+                   	document.getElementById('video').src = window.URL.createObjectURL(stream);;
+                   	$('#share_screen').hide();
+               	}, function() {
+                   	alert('Error, my friend. Screen stream is not available. Try in latest Chrome with Screen sharing enabled in about:flags.');
+                 	}
+          	)
+     	})
+	</script>
+</body>
+</html>
