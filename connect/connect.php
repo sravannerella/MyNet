@@ -114,18 +114,18 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
         </div>
     </li>
 
-    <!-- <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Search"><i class="fa fa-search"></i></a></li> -->
+    <!-- <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Search"><i class="material-icons">search</i></a></li> -->
     <li class="w3-hide-small w3-dropdown-hover">
-      <a href="#" class="w3-padding-large w3-hover-white" title="Notifications"><i class="fa fa-user"></i></a>     
+      <a href="#" class="w3-padding-large w3-hover-white" title="Notifications"><i class="material-icons">person</i></a>     
       <div class="w3-dropdown-content w3-medium w3-white w3-card-4">
         <a href="home">My Profile</a>
         <a href="#">Settings</a>
       </div>
     </li>
 
-    <li class="w3-hide-small"><a href="msg" class="w3-padding-large w3-hover-white" title="Conversations"><i class="fa fa-envelope"></i></a></li>
+    <li class="w3-hide-small"><a href="msg" class="w3-padding-large w3-hover-white" title="Conversations"><i class="material-icons">local_post_office</i></a></li>
     <li class="w3-hide-small w3-dropdown-hover">
-      <a href="#" class="w3-padding-large w3-hover-white" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green">3</span></a>     
+      <a href="#" class="w3-padding-large w3-hover-white" title="Notifications"><i class="material-icons">notifications</i><span class="w3-badge w3-right w3-small w3-green">3</span></a>     
       <div class="w3-dropdown-content w3-medium w3-white w3-card-4">
         <a href="#">Someone commented</a>
         <a href="#">Someone Liked</a>

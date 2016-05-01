@@ -2,27 +2,7 @@
 	include 'connect/connect.php';
 	if(!isset($_SESSION["email"])){
     	echo "<meta http-equiv=\"refresh\" content=\"0; url=http://areal.x10host.com\">";
-  	} else{
-	    $email = $_SESSION["email"];
-	    $querier = "SELECT * FROM `messages` WHERE user_from = '".$email."' OR user_to = '".$email."';";
-	    $queryResults = $connection->query($querier);
-
-	    $counter = $queryResults->num_rows;
-	    $output = "";
-	    if($counter == 0){
-	      $output = 'No Results';
-	      echo $output;
-	    }
-	    else{
-	      while($nrow = $queryResults->fetch_array(MYSQLI_BOTH)){
-	        $from = $nrow["user_from"];
-	        $to = $nrow["user_to"];
-	        $msg = $nrow["message"];
-	        echo $from. " ". $to. " ". $msg;
-	      }
-	    }
-
-	  }
+  	}
 ?>
 
 <link rel="stylesheet" type="text/css" href="css/jquery.emojipicker.css">
@@ -71,60 +51,18 @@
 		</div>
 		<div class="w3-container" id="messages" style="height: 700px; overflow: scroll;">
 			<br>
-			<div class="w3-container">
-				<div class="w3-left w3-round-xlarge w3-padding w3-grey" style="max-width: 50%;"> Hello world</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-right w3-round-xlarge w3-padding w3-blue" style="max-width: 50%;">Hello! Is it working?
-				</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-left w3-round-xlarge w3-padding w3-grey"> Yes it is working.</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-right w3-round-xlarge w3-padding w3-blue" style="max-width: 50%;">Excellent! <img src="../images/emotions/smile.png">. Lets see
-				</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-left w3-round-xlarge w3-padding w3-grey" style="max-width: 50%;"> So how are things going?</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-right w3-round-xlarge w3-padding w3-blue" style="max-width: 50%;">Fine. Trying to make this messages work. that's it
-				</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-left w3-round-xlarge w3-padding w3-grey"> Oh. Cool.</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-right w3-round-xlarge w3-padding w3-blue" style="max-width: 50%;">Let me know, once it's done.
-				</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-left w3-round-xlarge w3-padding w3-grey" style="max-width: 50%;"> Sure. Will.</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-right w3-round-xlarge w3-padding w3-blue" style="max-width: 50%;">We will test it out.
-				</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container">
-				<div class="w3-left w3-round-xlarge w3-padding w3-grey"> Yeah. I need people to test it.</div>
-			</div>
-			<hr class="heightChange">
-			<div class="w3-container" id="myMessage">
-				<div class="w3-right w3-round-xlarge w3-padding w3-blue" style="max-width: 50%;">Awesome! <img src="../images/emotions/love.png">
-				</div>
-			</div>
-			<hr class="heightChange">
+			<?php
+				$email = $_SESSION['email'];
+				$query = "SELECT * FROM `conversations` WHERE user_from='".$email."' OR user_to= '". $email."' ;";
+				$queryResults = $connection->query($query);
+				$row = $queryResults->fetch_array(MYSQLI_BOTH);
+				$id = $row['id'];
+				$from = $row['user_from'];
+				$to = $row['user_to'];
+
+				include 'connect/getMsg.php';
+
+			?>
 		</div>
 
 		<div class="w3-container w3-padding w3-light-grey">
@@ -148,11 +86,32 @@
 <script type="text/javascript" src="js/jquery.emojis.js"></script>
 
 <script>
+
+	setInterval("updateContent();", 1000 ); 
+   	function updateContent() {
+   		var email = '<?php echo $email;?>';
+   		$.ajax({
+   			url: "connect/getMsg.php",
+   			type: "POST",
+	        cache: false,
+	        data: {
+	            email: email
+	        },
+	        success: function(data){
+	        	$('#messages').html(data);
+	        },
+	        error: function(data){
+	        	alert("Failed");
+	        }
+   		});
+    } 
+
 	$(document).ready(function(e){
 		$("#message").emojiPicker({
 			height: '200px',
 			button: false
 		});
+
 	});
 
 	$("#emotion").click(function(e){
@@ -166,7 +125,38 @@
 			$("#message").val('');
     	} else{
 			var msg = $("#message").val();
+			var user_from = '<?php echo $email; ?>';
+			var user_to = '<?php echo $to; ?>';
+			if(user_to == user_from){
+				user_to = '<?php echo $from;?>';
+			}
+			var id = '<?php echo $id; ?>';
+
 			$("#message").val('');
+
+			$.ajax({
+	            url: "connect/sendMsg.php",
+	            type: "POST",
+	            cache: false,
+	            data: {
+	              message: msg,
+	              user_from: user_from,
+	              user_to: user_to,
+	              id: id
+	            },
+	            success: function(){
+	              $("#message").val('');
+	            },
+	            error: function(){
+	              alert("failed");
+	            }
+	        });
+
+			msg = msg.replace(":)", '<img src="../images/emotions/smile.png">');
+			msg = msg.replace(":D", '<img src="../images/emotions/laugh.png">');
+			msg = msg.replace("<3", '<img src="../images/emotions/love.png">');
+			msg = msg.replace(";p", '<img src="../images/emotions/winkTongue.png">');
+			msg = msg.replace(";P", '<img src="../images/emotions/winkTongue.png">');
 
 			$("#messages").append('<div class="w3-container"><div class="w3-right w3-round-xlarge w3-padding w3-blue w3-animate-bottom" style="max-width: 50%;">'+ msg +'</div></div><hr class="heightChange">');
 		}
@@ -178,16 +168,7 @@
 				e.preventDefault();
     		} else{
 				e.preventDefault();
-				var msg = $("#message").val();
-				$("#message").val('');
-
-				msg = msg.replace(":)", '<img src="../images/emotions/smile.png">');
-				msg = msg.replace(":D", '<img src="../images/emotions/laugh.png">');
-				msg = msg.replace("<3", '<img src="../images/emotions/love.png">');
-				msg = msg.replace(";p", '<img src="../images/emotions/winkTongue.png">');
-				msg = msg.replace(";P", '<img src="../images/emotions/winkTongue.png">');
-
-				$("#messages").append('<div class="w3-container"><div class="w3-right w3-round-xlarge w3-padding w3-blue w3-animate-bottom" style="max-width: 50%;">'+ msg +'</div></div><hr class="heightChange">');
+				$("#sender").click();
 			}
 		}
 	});
