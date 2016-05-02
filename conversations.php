@@ -16,34 +16,37 @@
 	<div class="w3-quarter">
 		<div class="w3-container" style="height: 850px; overflow: scroll;">
 			<ul class="w3-ul w3-card">
-			  <li class="w3-padding-hor-16 w3-hover-shadow">
-			    <span onclick="this.parentElement.style.display='none'" 
-			    class="w3-closebtn w3-padding w3-margin-right w3-small">x</span>
-			    <img src="../images/image1.png" class="w3-left w3-circle w3-margin-right" style="width:50px; height: 50px">
-			    <span class="w3-medium"><b>Mike</b></span><br>
-    			<i style="font-size: 10px;">Last Seen 11:10AM</i>
-			  </li>
-			  <li class="w3-padding-hor-16 w3-hover-shadow">
-			    <span onclick="this.parentElement.style.display='none'" 
-			    class="w3-closebtn w3-padding w3-margin-right w3-small">x</span>
-			    <img src="../images/image2.png" class="w3-left w3-circle w3-margin-right" style="width:50px; height: 50px">
-			    <span class="w3-medium"><b>Jill</b></span><br>
-    			<i style="font-size: 10px;">Last Seen 11:10AM</i>
-			  </li>  
-			  <li class="w3-padding-hor-16 w3-hover-shadow">
-			    <span onclick="this.parentElement.style.display='none'" 
-			    class="w3-closebtn w3-padding w3-margin-right w3-small">x</span>
-			    <img src="../images/image3.png" class="w3-left w3-circle w3-margin-right" style="width:50px; height: 50px">
-			    <span class="w3-medium"><b>Jane</b></span><br>
-    			<i style="font-size: 10px;">Last Seen 11:10AM</i>
-			  </li> 
+			<?php 
+				$email = $_SESSION['email'];
+				$query = "SELECT * FROM `conversations` WHERE user_from='".$email."' OR user_to= '". $email."' ;";
+				$queryResults = $connection->query($query);
+				while($row = $queryResults->fetch_array(MYSQLI_BOTH)){
+					$id = $row['id'];
+					$from = $row['user_from'];
+					$to = $row['user_to'];
+
+					$name = $from;
+					if($name == $email){
+						$name = $to;
+					}
+
+					$get = "SELECT * FROM `Users` WHERE email = '".$name."';";
+					$queryResults1 = $connection->query($get);
+					$rower = $queryResults1->fetch_array(MYSQLI_BOTH);
+					$firstName = $rower['first'];
+
+					$name = $firstName;
+					echo '<li class="w3-padding-hor-16 w3-hover-shadow"><span onclick="this.parentElement.style.display=\'none\'" class="w3-closebtn w3-padding w3-margin-right w3-small">x</span><img src="../images/image1.png" class="w3-left w3-circle w3-margin-right" style="width:50px; height: 50px"><span class="w3-medium"><b class="userName">'. ucfirst($name) .'</b></span><br><i style="font-size: 10px;">Last Seen 11:10AM</i></li>';
+				}
+			?>
+			  
 			</ul>
 		</div>
 	</div>
 
-	<div class="w3-rest">
+	<div class="w3-rest" id="msgContainer" style="display: none;">
 		<div class="w3-container w3-padding-large w3-light-grey">
-			<span class="w3-large">Mike</span>
+			<span class="w3-large userNameChange"><?php echo ucfirst($name); ?></span>
 			<div class="w3-right">
 				<a href="#" id="delete"><i class="material-icons w3-padding-left" title="delete">delete</i></a>
 				<a href="#" id="favorite"><i class="material-icons w3-padding-left" title="favorite">favorite</i></a>
@@ -52,16 +55,7 @@
 		<div class="w3-container" id="messages" style="height: 700px; overflow: scroll;">
 			<br>
 			<?php
-				$email = $_SESSION['email'];
-				$query = "SELECT * FROM `conversations` WHERE user_from='".$email."' OR user_to= '". $email."' ;";
-				$queryResults = $connection->query($query);
-				$row = $queryResults->fetch_array(MYSQLI_BOTH);
-				$id = $row['id'];
-				$from = $row['user_from'];
-				$to = $row['user_to'];
-
 				include 'connect/getMsg.php';
-
 			?>
 		</div>
 
@@ -86,32 +80,47 @@
 <script type="text/javascript" src="js/jquery.emojis.js"></script>
 
 <script>
-
-	setInterval("updateContent();", 1000 ); 
+	setInterval("updateContent();", 1000 );
    	function updateContent() {
    		var email = '<?php echo $email;?>';
+   		var reciever = $('.userNameChange').text();
    		$.ajax({
    			url: "connect/getMsg.php",
    			type: "POST",
 	        cache: false,
 	        data: {
-	            email: email
+	            email: email,
+	            reciever: reciever
 	        },
 	        success: function(data){
 	        	$('#messages').html(data);
 	        },
 	        error: function(data){
-	        	alert("Failed");
+	        	console.log("");
 	        }
    		});
-    } 
+   		scroller();
+    }
+
+    $(".w3-ul li").click(function(){
+    	var userName = $(this).find('.userName').text();
+    	$("#msgContainer").removeAttr("style");
+    	$('.userNameChange').text(userName);
+    	$(".w3-ul li").each(function(){
+    		$(this).removeClass("w3-green");
+    	});
+    	$(this).addClass("w3-green");
+    });
+
+    function scroller(){
+    	$("#messages").animate({ scrollTop: $("#messages")[0].scrollHeight});
+    }
 
 	$(document).ready(function(e){
 		$("#message").emojiPicker({
 			height: '200px',
 			button: false
 		});
-
 	});
 
 	$("#emotion").click(function(e){
@@ -126,11 +135,7 @@
     	} else{
 			var msg = $("#message").val();
 			var user_from = '<?php echo $email; ?>';
-			var user_to = '<?php echo $to; ?>';
-			if(user_to == user_from){
-				user_to = '<?php echo $from;?>';
-			}
-			var id = '<?php echo $id; ?>';
+			var user_to = $('.userNameChange').text();
 
 			$("#message").val('');
 
@@ -141,24 +146,25 @@
 	            data: {
 	              message: msg,
 	              user_from: user_from,
-	              user_to: user_to,
-	              id: id
+	              user_to: user_to
 	            },
 	            success: function(){
 	              $("#message").val('');
 	            },
 	            error: function(){
-	              alert("failed");
+	              console.log("");
 	            }
 	        });
 
-			msg = msg.replace(":)", '<img src="../images/emotions/smile.png">');
-			msg = msg.replace(":D", '<img src="../images/emotions/laugh.png">');
-			msg = msg.replace("<3", '<img src="../images/emotions/love.png">');
-			msg = msg.replace(";p", '<img src="../images/emotions/winkTongue.png">');
-			msg = msg.replace(";P", '<img src="../images/emotions/winkTongue.png">');
+			msg = msg.replace(":)", '<img src="images/emotions/smile.png">');
+			msg = msg.replace(":D", '<img src="images/emotions/laugh.png">');
+			msg = msg.replace("<3", '<img src="images/emotions/love.png">');
+			msg = msg.replace(";p", '<img src="images/emotions/winkTongue.png">');
+			msg = msg.replace(";P", '<img src="images/emotions/winkTongue.png">');
+			msg = msg.replace(';)', '<img src="images/emotions/wink.png">');
 
 			$("#messages").append('<div class="w3-container"><div class="w3-right w3-round-xlarge w3-padding w3-blue w3-animate-bottom" style="max-width: 50%;">'+ msg +'</div></div><hr class="heightChange">');
+			scroller();
 		}
 	});
 
